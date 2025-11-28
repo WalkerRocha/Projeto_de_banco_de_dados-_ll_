@@ -84,7 +84,8 @@ Essa seção apresenta o projeto conceitual da Help, descrevendo as principais e
 
 **Figura 1 – Diagrama ER do modelo conceitual do banco de dados Help**
 
-imagem (imagem a colocar)
+![Diagrama ER](imgs/mapahelp.png)
+
 
 **Fonte:** [https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing](https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing)
 
