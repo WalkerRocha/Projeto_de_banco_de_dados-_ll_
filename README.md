@@ -99,7 +99,7 @@ Essa seção apresenta o **projeto lógico** do banco de dados Help (v1.0), desc
 
 **Figura 2 – Diagrama do modelo de implementação relacional da Help (v1.0)**
 
-imagem (imagem a colocar)
+![Diagrama Projeto Lógico](imgs/mapa2.png)
 
 **Fonte:** [https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing](https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing)
 
@@ -122,5 +122,161 @@ Propusemos uma **especificação de minimundo**, **requisitos funcionais e opera
 ### 5.1 Criação da Base
 
 ```sql
+-- CRIANDO A BASE
 CREATE DATABASE HELP;
+
+-- 1 - COMANDOS SQL-DDL // 1.1 - Criação das tabelas
 USE HELP;
+CREATE TABLE Pessoa(ID INT PRIMARY KEY AUTO_INCREMENT, Nome VARCHAR(300));
+
+CREATE TABLE Responsavel(CPF CHAR(14) PRIMARY KEY, 
+ID_Pessoa INT NOT NULL, Email VARCHAR(100), 
+Telefone VARCHAR(17), Contato VARCHAR(150), 
+Endereco VARCHAR(200), Complemento VARCHAR(50), 
+Cidade_Estado VARCHAR(50), CEP VARCHAR(10), 
+Bairro VARCHAR(100));
+
+CREATE TABLE Aluno(ID_Pessoa INT PRIMARY KEY, 
+CPF_Responsavel CHAR(14) NOT NULL);
+
+
+DROP TABLE Plano;
+CREATE TABLE Plano(Num_Contrato INT PRIMARY KEY AUTO_INCREMENT, ID_Aluno INT NOT NULL, 
+Endereco VARCHAR(300), CPF CHAR(14), Status_Plano BOOLEAN NOT NULL, 
+Tipo VARCHAR(30) COMMENT 'Inglês ou Preparatório', 
+Data_Inicio DATE, Data_Vencimento DATE, Formato VARCHAR(30) COMMENT 'Sozinho ou em Grupo', 
+Modalidade VARCHAR(30) COMMENT 'Presencial ou Online', 
+Valor DECIMAL, Quantidade_Aulas_Semanais INT,
+Taxa_Matricula DECIMAL, Desconto DOUBLE);
+
+CREATE TABLE Dia_Semana (Num_Contrato INT, Dia_da_semana VARCHAR(30),
+PRIMARY KEY(Num_Contrato, Dia_da_semana));
+
+CREATE TABLE Professor(CPF CHAR(14) PRIMARY KEY, ID_Pessoa INT NOT NULL, RG CHAR(12), 
+Endereco VARCHAR(200), Dados_bancarios VARCHAR(200));
+
+
+CREATE TABLE Contrato(CPF_Professor CHAR(14) PRIMARY KEY,
+Data_Inicio DATE, Data_Fim DATE, Tipo VARCHAR(50) COMMENT 'CLT ou Horista');
+
+CREATE TABLE Disciplina(Nome VARCHAR(200) PRIMARY KEY);
+
+CREATE TABLE Especializacoes(CPF_Professor CHAR(14), Disciplina VARCHAR(200),
+PRIMARY KEY(CPF_Professor, Disciplina));
+
+CREATE TABLE Turma(ID INT PRIMARY KEY AUTO_INCREMENT, 
+Tipo VARCHAR(50) COMMENT 'Inglês, Refoço ou Preparatório', Nome VARCHAR(150));
+
+CREATE TABLE Aula_Ingles(ID_Aula INT PRIMARY KEY AUTO_INCREMENT, 
+ID_Turma INT NOT NULL,CPF_Professor CHAR(14) NOT NULL, 
+Modalidade VARCHAR(50) COMMENT 'Online ou Presencial', Data_aula DATE,
+Hora_Inicio TIME, Hora_Fim TIME, Aula_realizada BOOLEAN, Duracao TIME,
+Observacoes VARCHAR(300), Dever_De_Casa VARCHAR(300), 
+Conteudo_Da_Aula VARCHAR(300), Conteudo_Proxima_Aula VARCHAR(300));
+
+CREATE TABLE Aula_Reforco(ID_Aula INT PRIMARY KEY AUTO_INCREMENT, 
+ID_Turma INT NOT NULL, CPF_Professor CHAR(14) NOT NULL, 
+Modalidade VARCHAR(50) COMMENT 'Online ou Presencial', Data_Aula DATE, 
+Hora_Inicio TIME, Hora_Fim TIME, Aula_Realizada BOOLEAN, Duracao TIME, 
+Observacoes VARCHAR(300), Disciplina VARCHAR(200));
+
+CREATE TABLE Aula_Preparatorio(ID_Aula INT PRIMARY KEY AUTO_INCREMENT, ID_Turma INT NOT NULL, 
+CPF_Professor CHAR(14) NOT NULL, Modalidade VARCHAR(50) COMMENT 'Online ou Presencial', 
+Data_Aula DATE, Hora_Inicio TIME, Hora_Fim TIME, Aula_Realizada BOOLEAN, Duracao TIME, 
+Observacoes VARCHAR(300), Tipo VARCHAR(100), Disciplina VARCHAR(200));
+
+CREATE TABLE Participa(ID_Aluno INT, ID_Turma INT,
+PRIMARY KEY(ID_Aluno, ID_Turma));
+
+
+
+-- 1 - COMANDOS SQL-DDL // 1.2 - Criação das foreign keys
+
+ALTER TABLE responsavel
+ADD CONSTRAINT pessoa_responsavel
+FOREIGN KEY (ID_Pessoa)
+REFERENCES pessoa(ID)
+ON DELETE RESTRICT;
+
+
+ALTER TABLE aluno
+ADD CONSTRAINT pessoa_aluno
+FOREIGN KEY (ID_Pessoa)
+REFERENCES pessoa(ID)
+ON DELETE RESTRICT;
+
+ALTER TABLE aluno
+ADD CONSTRAINT resposavel_do_aluno
+FOREIGN KEY (CPF_Responsavel) 
+REFERENCES Responsavel(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE plano
+ADD CONSTRAINT id_aluno_plano
+FOREIGN KEY (ID_Aluno) REFERENCES Aluno(ID_Pessoa)
+ON DELETE RESTRICT;
+
+ALTER TABLE Dia_Semana
+ADD CONSTRAINT respectivo_dia_semana_num_contrato
+FOREIGN KEY (Num_Contrato) REFERENCES Plano(Num_Contrato)
+ON DELETE RESTRICT;
+
+ALTER TABLE Professor
+ADD CONSTRAINT pessoa_professor
+FOREIGN KEY (ID_Pessoa) REFERENCES Pessoa(ID)
+ON DELETE RESTRICT;
+
+ALTER TABLE Contrato
+ADD CONSTRAINT contrato_do_professor_x
+FOREIGN KEY (CPF_Professor) REFERENCES Professor(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE Especializacoes
+ADD CONSTRAINT especializacao_do_professor
+FOREIGN KEY (CPF_Professor) REFERENCES Professor(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE Especializacoes
+ADD CONSTRAINT disciplina_dada
+FOREIGN KEY (Disciplina) REFERENCES Disciplina(Nome)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_Ingles
+ADD CONSTRAINT professor_que_ministrou_aula_ingles
+FOREIGN KEY (CPF_Professor) REFERENCES Professor(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_Ingles
+ADD CONSTRAINT turma_presente_na_aula_de_ingles
+FOREIGN KEY (ID_Turma) REFERENCES Turma(ID)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_reforco
+ADD CONSTRAINT turma_presente_na_aula_de_reforco
+FOREIGN KEY (ID_Turma) REFERENCES Turma(ID)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_reforco
+ADD CONSTRAINT professor_que_ministrou_aula_reforco
+FOREIGN KEY (CPF_Professor) REFERENCES Professor(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_Preparatorio
+ADD CONSTRAINT professor_que_ministrou_aula_preparatorio
+FOREIGN KEY (CPF_Professor) REFERENCES Professor(CPF)
+ON DELETE RESTRICT;
+
+ALTER TABLE Aula_Preparatorio
+ADD CONSTRAINT turma_presente_na_aula_preparatorio
+FOREIGN KEY (ID_Turma) REFERENCES Turma(ID)
+ON DELETE RESTRICT;
+
+ALTER TABLE participa
+ADD CONSTRAINT aluno_em_turmas
+FOREIGN KEY (ID_Aluno) REFERENCES Aluno(ID_Pessoa)
+ON DELETE RESTRICT;
+
+ALTER TABLE participa
+ADD CONSTRAINT turma_contem_alunos
+FOREIGN KEY (ID_Turma) REFERENCES Turma(ID)
+ON DELETE RESTRICT;
