@@ -99,7 +99,7 @@ Essa seção apresenta o **projeto lógico** do banco de dados Help (v1.0), desc
 
 **Figura 2 – Diagrama do modelo de implementação relacional da Help (v1.0)**
 
-![Diagrama Projeto Lógico](imgs/mapa2.png)
+![Diagrama Projeto Lógico](./imgs/mapa2.jpg)
 
 **Fonte:** [https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing](https://drive.google.com/file/d/1yTv-oxq4DCJYTdkRxS52tjXToQKeIKPM/view?usp=sharing)
 
